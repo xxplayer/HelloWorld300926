@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>梅花易数 · 64 Gua + 十翼大象</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:1.2rem .8rem}
+    .container{max-width:580px;width:100%;background:#1e293b;border-radius:12px;padding:1.3rem;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+    h1{font-size:1.2rem;font-weight:600;text-align:center;margin-bottom:.25rem;color:#f8fafc}
+    .subtitle{text-align:center;font-size:.78rem;color:#94a3b8;margin-bottom:1rem;line-height:1.4}
+    .mode-switch{display:flex;background:#0f172a;border-radius:8px;padding:3px;margin-bottom:1rem}
+    .mode-switch button{flex:1;padding:.5rem;border:none;border-radius:6px;font-size:.82rem;font-weight:500;cursor:pointer;background:transparent;color:#94a3b8;transition:all .15s}
+    .mode-switch button.active{background:#0ea5e9;color:#fff}
+    .inputs{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem;margin-bottom:.9rem}
+    label{display:block;font-size:.65rem;color:#94a3b8;margin-bottom:.12rem}
+    input[type=number]{width:100%;padding:.4rem .25rem;border:1px solid #334155;border-radius:6px;background:#0f172a;color:#f1f5f9;font-size:.88rem;text-align:center}
+    input[type=number]:focus{outline:none;border-color:#38bdf8}
+    input:disabled{opacity:.4}
+    .btn-row{display:flex;gap:.5rem;margin-bottom:1.1rem}
+    .btn-row button{flex:1;padding:.55rem;border:none;border-radius:6px;font-size:.85rem;font-weight:500;cursor:pointer;transition:background .15s}
+    #btnNow{background:#334155;color:#e2e8f0}#btnNow:hover{background:#475569}
+    #btnCalc{background:#0ea5e9;color:#fff}#btnCalc:hover{background:#0284c7}
+    .result{background:#0f172a;border-radius:8px;padding:1rem;display:none}.result.show{display:block}
+    .hex-row{display:flex;justify-content:space-around;gap:.8rem;margin-bottom:.8rem}
+    .hex-box{flex:1;text-align:center;background:#1e293b;border-radius:8px;padding:.7rem .4rem}
+    .hex-label{font-size:.68rem;color:#64748b;margin-bottom:.35rem}
+    .hex-name{font-size:1.05rem;font-weight:600;color:#fbbf24;margin-bottom:.15rem}
+    .hex-en{font-size:.72rem;color:#94a3b8;margin-bottom:.5rem}
+    .yao-lines{display:flex;flex-direction:column-reverse;gap:5px;align-items:center;margin:.4rem 0}
+    .yao{height:8px;border-radius:2px;position:relative}
+    .yao.yang{width:52px;background:#e2e8f0}
+    .yao.yin{width:52px;background:transparent;display:flex;justify-content:space-between}
+    .yao.yin::before,.yao.yin::after{content:"";width:22px;height:8px;background:#e2e8f0;border-radius:2px}
+    .yao.changing{outline:2px solid #fbbf24;outline-offset:2px}
+    .yao-num{position:absolute;right:-16px;top:-2px;font-size:.58rem;color:#64748b}
+    .trigram-info{font-size:.7rem;color:#94a3b8;margin-top:.3rem}
+    .changing-info{text-align:center;margin:.5rem 0;font-size:.85rem;color:#cbd5e1}.changing-info strong{color:#fbbf24}
+    .explain{margin-top:.9rem;text-align:left}
+    .explain-block{background:#1e293b;border-radius:8px;padding:.7rem .8rem;margin-bottom:.55rem}
+    .explain-title{font-size:.7rem;color:#64748b;margin-bottom:.3rem;font-weight:500}
+    .explain-cn{font-size:.9rem;color:#f1f5f9;line-height:1.55;margin-bottom:.2rem}
+    .explain-en{font-size:.73rem;color:#94a3b8;line-height:1.45;font-style:italic}
+    .meta{font-size:.7rem;color:#64748b;border-top:1px solid #1e293b;padding-top:.6rem;line-height:1.5;text-align:left;margin-top:.6rem}
+    .meta span{color:#94a3b8}.formula{font-size:.68rem;color:#475569;margin-top:.3rem}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>梅花易数 · 64 Gua + 十翼大象</h1>
+    <p class="subtitle">本卦 · 变卦 · 卦辞 · 爻辞 · 大象（十翼·象传 全部64条）</p>
+    <div class="mode-switch">
+      <button type="button" id="modeTime" class="active">DateTime 模式</button>
+      <button type="button" id="modeRandom">True Random 模式</button>
+    </div>
+    <div class="inputs" id="timeInputs">
+      <div><label>Year 年</label><input type="number" id="year" min="1" max="9999"></div>
+      <div><label>Month 月</label><input type="number" id="month" min="1" max="12"></div>
+      <div><label>Day 日</label><input type="number" id="day" min="1" max="31"></div>
+      <div><label>Hour 时</label><input type="number" id="hour" min="0" max="23"></div>
+      <div><label>Minute 分</label><input type="number" id="minute" min="0" max="59"></div>
+      <div><label>Second 秒</label><input type="number" id="second" min="0" max="59"></div>
+    </div>
+    <div class="btn-row">
+      <button type="button" id="btnNow">Use Current Time</button>
+      <button type="button" id="btnCalc">Calculate</button>
+    </div>
+    <div class="result" id="result">
+      <div class="hex-row">
+        <div class="hex-box">
+          <div class="hex-label">本卦 Original</div>
+          <div class="hex-name" id="benName"></div>
+          <div class="hex-en" id="benEn"></div>
+          <div class="yao-lines" id="benLines"></div>
+          <div class="trigram-info" id="benTrigram"></div>
+        </div>
+        <div class="hex-box">
+          <div class="hex-label">变卦 Changed</div>
+          <div class="hex-name" id="bianName"></div>
+          <div class="hex-en" id="bianEn"></div>
+          <div class="yao-lines" id="bianLines"></div>
+          <div class="trigram-info" id="bianTrigram"></div>
+        </div>
+      </div>
+      <div class="changing-info">动爻 Changing Yao：第 <strong id="yaoVal"></strong> 爻</div>
+      <div class="explain">
+        <div class="explain-block">
+          <div class="explain-title">本卦卦辞 · Judgment（《易经》原文）</div>
+          <div class="explain-cn" id="benJudgmentCn"></div>
+          <div class="explain-en" id="benJudgmentEn"></div>
+        </div>
+        <div class="explain-block">
+          <div class="explain-title">本卦大象 · The Image（十翼·象传）</div>
+          <div class="explain-cn" id="benXiangCn"></div>
+          <div class="explain-en" id="benXiangEn"></div>
+        </div>
+        <div class="explain-block">
+          <div class="explain-title">动爻爻辞 · Line Text</div>
+          <div class="explain-cn" id="yaoCiCn"></div>
+          <div class="explain-en" id="yaoCiEn"></div>
+        </div>
+        <div class="explain-block">
+          <div class="explain-title">变卦卦辞 · Judgment of Changed</div>
+          <div class="explain-cn" id="bianJudgmentCn"></div>
+          <div class="explain-en" id="bianJudgmentEn"></div>
+        </div>
+        <div class="explain-block">
+          <div class="explain-title">变卦大象 · The Image of Changed（十翼·象传）</div>
+          <div class="explain-cn" id="bianXiangCn"></div>
+          <div class="explain-en" id="bianXiangEn"></div>
+        </div>
+      </div>
+      <div class="meta" id="metaInfo"></div>
+    </div>
+  </div>
+  <script>
+const BAGUA={1:{cn:"乾",en:"Qian",symbol:"☰",bin:[1,1,1]},2:{cn:"兑",en:"Dui",symbol:"☱",bin:[1,1,0]},3:{cn:"离",en:"Li",symbol:"☲",bin:[1,0,1]},4:{cn:"震",en:"Zhen",symbol:"☳",bin:[1,0,0]},5:{cn:"巽",en:"Xun",symbol:"☴",bin:[0,1,1]},6:{cn:"坎",en:"Kan",symbol:"☵",bin:[0,1,0]},7:{cn:"艮",en:"Gen",symbol:"☶",bin:[0,0,1]},8:{cn:"坤",en:"Kun",symbol:"☷",bin:[0,0,0]}};
+const HEX={
+"1_1":{cn:"乾为天",en:"Qian · The Creative",num:1,jCn:"元亨利贞。",jEn:"The Creative works sublime success, furthering through perseverance.",xCn:"天行健，君子以自强不息。",xEn:"The movement of heaven is full of power. Thus the superior man makes himself strong and untiring."},
+"1_2":{cn:"天泽履",en:"Lü · Treading",num:10,jCn:"履虎尾，不咥人，亨。",jEn:"Treading upon the tail of the tiger. It does not bite the man. Success.",xCn:"上天下泽，履；君子以辨上下，定民志。",xEn:"Heaven above, the lake below: Treading. The superior man discriminates between high and low, and strengthens the minds of the people."},
+"1_3":{cn:"天火同人",en:"Tong Ren · Fellowship",num:13,jCn:"同人于野，亨。利涉大川，利君子贞。",jEn:"Fellowship with men in the open. Success. It furthers one to cross the great water.",xCn:"天与火，同人；君子以类族辨物。",xEn:"Heaven together with fire: Fellowship. The superior man organizes the clans and makes distinctions of things."},
+"1_4":{cn:"天雷无妄",en:"Wu Wang · Innocence",num:25,jCn:"元亨，利贞。其匪正有眚，不利有攸往。",jEn:"Innocence. Supreme success. Perseverance furthers.",xCn:"天下雷行，物与无妄；先王以茂对时育万物。",xEn:"Under heaven thunder rolls: All things attain the natural state of innocence. The kings of old fostered and nourished all beings."},
+"1_5":{cn:"天风姤",en:"Gou · Coming to Meet",num:44,jCn:"女壮，勿用取女。",jEn:"Coming to Meet. The maiden is powerful. One should not marry such a maiden.",xCn:"天下有风，姤；后以施命诰四方。",xEn:"Under heaven, wind: Coming to Meet. The sovereign issues his commands and disseminates them to the four quarters."},
+"1_6":{cn:"天水讼",en:"Song · Conflict",num:6,jCn:"有孚，窒惕，中吉，终凶。利见大人，不利涉大川。",jEn:"Conflict. You are sincere and are being obstructed. A cautious halt halfway brings good fortune.",xCn:"天与水违行，讼；君子以作事谋始。",xEn:"Heaven and water go their opposite ways: Conflict. The superior man carefully considers the beginning of any enterprise."},
+"1_7":{cn:"天山遁",en:"Dun · Retreat",num:33,jCn:"亨，小利贞。",jEn:"Retreat. Success. In what is small, perseverance furthers.",xCn:"天下有山，遁；君子以远小人，不恶而严。",xEn:"Mountain under heaven: Retreat. The superior man keeps the inferior man at a distance, not angrily but with reserve."},
+"1_8":{cn:"天地否",en:"Pi · Standstill",num:12,jCn:"否之匪人，不利君子贞，大往小来。",jEn:"Standstill. Evil people do not further the perseverance of the superior man.",xCn:"天地不交，否；君子以俭德辟难，不可荣以禄。",xEn:"Heaven and earth do not unite: Standstill. The superior man falls back upon his inner worth to escape difficulty."},
+"2_1":{cn:"泽天夬",en:"Guai · Breakthrough",num:43,jCn:"扬于王庭，孚号有厉，告自邑，不利即戎，利有攸往。",jEn:"Breakthrough. One must resolutely make the matter known at the court of the king.",xCn:"泽上于天，夬；君子以施禄及下，居德则忌。",xEn:"The lake has risen up to heaven: Breakthrough. The superior man dispenses riches downward and refrains from resting on his virtue."},
+"2_2":{cn:"兑为泽",en:"Dui · The Joyous",num:58,jCn:"亨，利贞。",jEn:"The Joyous. Success. Perseverance is favorable.",xCn:"丽泽，兑；君子以朋友讲习。",xEn:"Lakes resting one on the other: The Joyous. The superior man joins with his friends for discussion and practice."},
+"2_3":{cn:"泽火革",en:"Ge · Revolution",num:49,jCn:"己日乃孚，元亨利贞，悔亡。",jEn:"Revolution. On your own day you are believed. Supreme success.",xCn:"泽中有火，革；君子以治历明时。",xEn:"Fire in the lake: Revolution. The superior man sets the calendar in order and makes the seasons clear."},
+"2_4":{cn:"泽雷随",en:"Sui · Following",num:17,jCn:"元亨利贞，无咎。",jEn:"Following has supreme success. Perseverance furthers. No blame.",xCn:"泽中有雷，随；君子以向晦入宴息。",xEn:"Thunder in the middle of the lake: Following. The superior man at nightfall goes indoors for rest and recuperation."},
+"2_5":{cn:"泽风大过",en:"Da Guo · Great Excess",num:28,jCn:"栋桡，利有攸往，亨。",jEn:"Preponderance of the Great. The ridgepole sags to the breaking point.",xCn:"泽灭木，大过；君子以独立不惧，遁世无闷。",xEn:"The lake rises above the trees: Great Excess. The superior man stands alone without fear and remains withdrawn from the world without melancholy."},
+"2_6":{cn:"泽水困",en:"Kun · Oppression",num:47,jCn:"亨，贞，大人吉，无咎，有言不信。",jEn:"Oppression. Success. Perseverance. The great man brings about good fortune.",xCn:"泽无水，困；君子以致命遂志。",xEn:"There is no water in the lake: Oppression. The superior man stakes his life on following his will."},
+"2_7":{cn:"泽山咸",en:"Xian · Influence",num:31,jCn:"亨，利贞，取女吉。",jEn:"Influence. Success. Perseverance furthers. To take a maiden to wife brings good fortune.",xCn:"山上有泽，咸；君子以虚受人。",xEn:"A lake on the mountain: Influence. The superior man encourages people to approach him by his readiness to receive them."},
+"2_8":{cn:"泽地萃",en:"Cui · Gathering",num:45,jCn:"亨。王假有庙，利见大人，亨，利贞。用大牲吉，利有攸往。",jEn:"Gathering Together. Success. The king approaches his temple.",xCn:"泽上于地，萃；君子以除戎器，戒不虞。",xEn:"The lake rising above the earth: Gathering. The superior man renews his weapons in order to meet the unforeseen."},
+"3_1":{cn:"火天大有",en:"Da You · Great Possession",num:14,jCn:"元亨。",jEn:"Possession in Great Measure. Supreme success.",xCn:"火在天上，大有；君子以遏恶扬善，顺天休命。",xEn:"Fire in heaven above: Great Possession. The superior man curbs evil and fosters good, and thereby obeys the benevolent will of heaven."},
+"3_2":{cn:"火泽睽",en:"Kui · Opposition",num:38,jCn:"小事吉。",jEn:"Opposition. In small matters, good fortune.",xCn:"上火下泽，睽；君子以同而异。",xEn:"Fire above, the lake below: Opposition. The superior man retains his individuality despite all community."},
+"3_3":{cn:"离为火",en:"Li · The Clinging",num:30,jCn:"利贞，亨。畜牝牛，吉。",jEn:"The Clinging. Perseverance furthers. It brings success. Care of the cow brings good fortune.",xCn:"明两作，离；大人以继明照于四方。",xEn:"That which is bright rises twice: The Clinging. The great man continues the brightness to illuminate the four quarters."},
+"3_4":{cn:"火雷噬嗑",en:"Shi He · Biting Through",num:21,jCn:"亨。利用狱。",jEn:"Biting Through has success. It is favorable to let justice be administered.",xCn:"雷电，噬嗑；先王以明罚敕法。",xEn:"Thunder and lightning: Biting Through. The kings of old clarified the penalties and enforced the laws."},
+"3_5":{cn:"火风鼎",en:"Ding · The Cauldron",num:50,jCn:"元吉，亨。",jEn:"The Cauldron. Supreme good fortune. Success.",xCn:"木上有火，鼎；君子以正位凝命。",xEn:"Fire over wood: The Cauldron. The superior man consolidates his fate by making his position correct."},
+"3_6":{cn:"火水未济",en:"Wei Ji · Before Completion",num:64,jCn:"亨，小狐汔济，濡其尾，无攸利。",jEn:"Before Completion. Success. But if the little fox gets his tail in the water, there is nothing that would further.",xCn:"火在水上，未济；君子以慎辨物居方。",xEn:"Fire over water: Before Completion. The superior man is careful in the differentiation of things, so that each finds its place."},
+"3_7":{cn:"火山旅",en:"Lü · The Wanderer",num:56,jCn:"小亨，旅贞吉。",jEn:"The Wanderer. Success through smallness. Perseverance brings good fortune to the wanderer.",xCn:"山上有火，旅；君子以明慎用刑，而不留狱。",xEn:"Fire on the mountain: The Wanderer. The superior man is clear-minded and cautious in imposing penalties, and protracts no lawsuits."},
+"3_8":{cn:"火地晋",en:"Jin · Progress",num:35,jCn:"康侯用锡马蕃庶，昼日三接。",jEn:"Progress. The powerful prince is honored with horses in large numbers.",xCn:"明出地上，晋；君子以自昭明德。",xEn:"The sun rises over the earth: Progress. The superior man himself brightens his bright virtue."},
+"4_1":{cn:"雷天大壮",en:"Da Zhuang · Great Power",num:34,jCn:"利贞。",jEn:"The Power of the Great. Perseverance furthers.",xCn:"雷在天上，大壮；君子以非礼弗履。",xEn:"Thunder in heaven above: Great Power. The superior man does not tread upon paths that do not accord with established order."},
+"4_2":{cn:"雷泽归妹",en:"Gui Mei · Marrying Maiden",num:54,jCn:"征凶，无攸利。",jEn:"The Marrying Maiden. Undertakings bring misfortune. Nothing that would further.",xCn:"泽上有雷，归妹；君子以永终知敝。",xEn:"Thunder over the lake: The Marrying Maiden. The superior man understands the lasting nature of endings and knows how to avoid exhaustion."},
+"4_3":{cn:"雷火丰",en:"Feng · Abundance",num:55,jCn:"亨，王假之，勿忧，宜日中。",jEn:"Abundance has success. The king attains abundance. Be not sad. Be like the sun at midday.",xCn:"雷电皆至，丰；君子以折狱致刑。",xEn:"Both thunder and lightning come: Abundance. The superior man decides lawsuits and carries out punishments."},
+"4_4":{cn:"震为雷",en:"Zhen · The Arousing",num:51,jCn:"亨。震来虩虩，笑言哑哑。震惊百里，不丧匕鬯。",jEn:"Shock brings success. Shock comes—oh, oh! Laughing words—ha, ha!",xCn:"洊雷，震；君子以恐惧修省。",xEn:"Thunder repeated: The Arousing. The superior man is fearful and apprehensive, and thus cultivates and examines himself."},
+"4_5":{cn:"雷风恒",en:"Heng · Duration",num:32,jCn:"亨，无咎，利贞，利有攸往。",jEn:"Duration. Success. No blame. Perseverance furthers.",xCn:"雷风，恒；君子以立不易方。",xEn:"Thunder and wind: Duration. The superior man stands firm and does not change his direction."},
+"4_6":{cn:"雷水解",en:"Xie · Deliverance",num:40,jCn:"利西南，无所往，其来复吉。有攸往，夙吉。",jEn:"Deliverance. The southwest furthers. If there is no longer anything where one has to go, return brings good fortune.",xCn:"雷雨作，解；君子以赦过宥罪。",xEn:"Thunder and rain set in: Deliverance. The superior man forgives errors and deals gently with misdeeds."},
+"4_7":{cn:"雷山小过",en:"Xiao Guo · Small Excess",num:62,jCn:"亨，利贞，可小事，不可大事。飞鸟遗之音，不宜上宜下，大吉。",jEn:"Preponderance of the Small. Success. Perseverance furthers. Small things may be done; great things should not be done.",xCn:"山上有雷，小过；君子以行过乎恭，丧过乎哀，用过乎俭。",xEn:"Thunder on the mountain: Small Excess. The superior man in his conduct exceeds in respect, in mourning exceeds in sorrow, in expenditure exceeds in economy."},
+"4_8":{cn:"雷地豫",en:"Yu · Enthusiasm",num:16,jCn:"利建侯行师。",jEn:"Enthusiasm. It furthers one to install helpers and to set armies marching.",xCn:"雷出地奋，豫；先王以作乐崇德，殷荐之上帝，以配祖考。",xEn:"Thunder comes resounding out of the earth: Enthusiasm. The ancient kings made music to honor merit, and offered it with splendor to the Supreme Deity."},
+"5_1":{cn:"风天小畜",en:"Xiao Xu · Small Taming",num:9,jCn:"亨。密云不雨，自我西郊。",jEn:"The Taming Power of the Small has success. Dense clouds, no rain from our western region.",xCn:"风行天上，小畜；君子以懿文德。",xEn:"The wind drives across heaven: Small Taming. The superior man refines the outward aspect of his nature."},
+"5_2":{cn:"风泽中孚",en:"Zhong Fu · Inner Truth",num:61,jCn:"豚鱼吉，利涉大川，利贞。",jEn:"Inner Truth. Pigs and fishes. Good fortune. It furthers one to cross the great water.",xCn:"泽上有风，中孚；君子以议狱缓死。",xEn:"Wind over the lake: Inner Truth. The superior man discusses criminal cases in order to delay executions."},
+"5_3":{cn:"风火家人",en:"Jia Ren · The Family",num:37,jCn:"利女贞。",jEn:"The Family. The perseverance of the woman furthers.",xCn:"风自火出，家人；君子以言有物，而行有恒。",xEn:"Wind comes forth from fire: The Family. The superior man has substance in his words and duration in his way of life."},
+"5_4":{cn:"风雷益",en:"Yi · Increase",num:42,jCn:"利有攸往，利涉大川。",jEn:"Increase. It furthers one to undertake something. It furthers one to cross the great water.",xCn:"风雷，益；君子以见善则迁，有过则改。",xEn:"Wind and thunder: Increase. The superior man, if he sees good, imitates it; if he has faults, he rids himself of them."},
+"5_5":{cn:"巽为风",en:"Xun · The Gentle",num:57,jCn:"小亨，利有攸往，利见大人。",jEn:"The Gentle. Success through what is small. It furthers one to have somewhere to go.",xCn:"随风，巽；君子以申命行事。",xEn:"Winds following one upon the other: The Gentle. The superior man spreads his commands abroad and carries out his undertakings."},
+"5_6":{cn:"风水涣",en:"Huan · Dispersion",num:59,jCn:"亨。王假有庙，利涉大川，利贞。",jEn:"Dispersion. Success. The king approaches his temple. It furthers one to cross the great water.",xCn:"风行水上，涣；先王以享于帝立庙。",xEn:"Wind over water: Dispersion. The ancient kings offered sacrifices to the Lord and built temples."},
+"5_7":{cn:"风山渐",en:"Jian · Development",num:53,jCn:"女归吉，利贞。",jEn:"Development. The maiden is given in marriage. Good fortune. Perseverance furthers.",xCn:"山上有木，渐；君子以居贤德善俗。",xEn:"On the mountain, a tree: Development. The superior man abides in dignity and virtue, in order to improve the mores."},
+"5_8":{cn:"风地观",en:"Guan · Contemplation",num:20,jCn:"盥而不荐，有孚颙若。",jEn:"Contemplation. The ablution has been made, but not yet the offering. Full of trust they look up to him.",xCn:"风行地上，观；先王以省方观民设教。",xEn:"The wind blows over the earth: Contemplation. The ancient kings examined the regions and observed the people, then set forth their teaching."},
+"6_1":{cn:"水天需",en:"Xu · Waiting",num:5,jCn:"有孚，光亨，贞吉，利涉大川。",jEn:"Waiting. If you are sincere, you have light and success. Perseverance brings good fortune.",xCn:"云上于天，需；君子以饮食宴乐。",xEn:"Clouds rise up to heaven: Waiting. The superior man eats and drinks, is joyous and of good cheer."},
+"6_2":{cn:"水泽节",en:"Jie · Limitation",num:60,jCn:"亨。苦节不可贞。",jEn:"Limitation. Success. Galling limitation must not be persevered in.",xCn:"泽上有水，节；君子以制数度，议德行。",xEn:"Water over the lake: Limitation. The superior man creates number and measure, and examines the nature of virtue and correct conduct."},
+"6_3":{cn:"水火既济",en:"Ji Ji · After Completion",num:63,jCn:"亨，小利贞，初吉终乱。",jEn:"After Completion. Success in small matters. Perseverance furthers. At the beginning good fortune, at the end disorder.",xCn:"水在火上，既济；君子以思患而预防之。",xEn:"Water over fire: After Completion. The superior man takes thought of misfortune and arms himself against it in advance."},
+"6_4":{cn:"水雷屯",en:"Zhun · Difficulty at the Beginning",num:3,jCn:"元亨利贞，勿用有攸往，利建侯。",jEn:"Difficulty at the Beginning works supreme success, furthering through perseverance. Nothing should be undertaken.",xCn:"云雷，屯；君子以经纶。",xEn:"Clouds and thunder: Difficulty at the Beginning. The superior man brings order out of confusion."},
+"6_5":{cn:"水风井",en:"Jing · The Well",num:48,jCn:"改邑不改井，无丧无得，往来井井。汔至，亦未繘井，羸其瓶，凶。",jEn:"The Well. The town may be changed, but the well cannot be changed.",xCn:"木上有水，井；君子以劳民劝相。",xEn:"Water over wood: The Well. The superior man encourages the people at their work and exhorts them to help one another."},
+"6_6":{cn:"坎为水",en:"Kan · The Abysmal",num:29,jCn:"有孚，维心亨，行有尚。",jEn:"The Abysmal repeated. If you are sincere, you have success in your heart, and whatever you do succeeds.",xCn:"水洊至，习坎；君子以常德行，习教事。",xEn:"Water flows on uninterruptedly: The Abysmal. The superior man walks in lasting virtue and practices the business of teaching."},
+"6_7":{cn:"水山蹇",en:"Jian · Obstruction",num:39,jCn:"利西南，不利东北；利见大人，贞吉。",jEn:"Obstruction. The southwest furthers. The northeast does not further. It furthers one to see the great man.",xCn:"山上有水，蹇；君子以反身修德。",xEn:"Water on the mountain: Obstruction. The superior man turns his attention to himself and molds his character."},
+"6_8":{cn:"水地比",en:"Bi · Holding Together",num:8,jCn:"吉。原筮元永贞，无咎。不宁方来，后夫凶。",jEn:"Holding Together brings good fortune. Inquire of the oracle once again whether you possess sublimity, constancy, and perseverance.",xCn:"地上有水，比；先王以建万国，亲诸侯。",xEn:"Water over the earth: Holding Together. The ancient kings bestowed the different states as fiefs and cultivated friendly relations with the feudal lords."},
+"7_1":{cn:"山天大畜",en:"Da Xu · Great Taming",num:26,jCn:"利贞，不家食吉，利涉大川。",jEn:"The Taming Power of the Great. Perseverance furthers. Not eating at home brings good fortune.",xCn:"天在山中，大畜；君子以多识前言往行，以畜其德。",xEn:"Heaven within the mountain: Great Taming. The superior man acquaints himself with many sayings of antiquity and many deeds of the past, in order to strengthen his character thereby."},
+"7_2":{cn:"山泽损",en:"Sun · Decrease",num:41,jCn:"有孚，元吉，无咎，可贞，利有攸往。曷之用？二簋可用享。",jEn:"Decrease combined with sincerity brings about supreme good fortune without blame.",xCn:"山下有泽，损；君子以惩忿窒欲。",xEn:"The lake at the foot of the mountain: Decrease. The superior man controls his anger and restrains his instincts."},
+"7_3":{cn:"山火贲",en:"Bi · Grace",num:22,jCn:"亨。小利有攸往。",jEn:"Grace has success. In small matters it is favorable to undertake something.",xCn:"山下有火，贲；君子以明庶政，无敢折狱。",xEn:"Fire at the foot of the mountain: Grace. The superior man clarifies the matter of administration, but does not dare to decide controversial issues."},
+"7_4":{cn:"山雷颐",en:"Yi · Nourishment",num:27,jCn:"贞吉。观颐，自求口实。",jEn:"The Corners of the Mouth. Perseverance brings good fortune. Pay heed to the providing of nourishment.",xCn:"山下有雷，颐；君子以慎言语，节饮食。",xEn:"Thunder under the mountain: Nourishment. The superior man is careful in his words and temperate in eating and drinking."},
+"7_5":{cn:"山风蛊",en:"Gu · Work on the Decayed",num:18,jCn:"元亨，利涉大川。先甲三日，后甲三日。",jEn:"Work on What Has Been Spoiled has supreme success. It furthers one to cross the great water.",xCn:"山下有风，蛊；君子以振民育德。",xEn:"The wind blows low on the mountain: Work on the Decayed. The superior man stirs up the people and strengthens their spirit."},
+"7_6":{cn:"山水蒙",en:"Meng · Youthful Folly",num:4,jCn:"亨。匪我求童蒙，童蒙求我。初筮告，再三渎，渎则不告。利贞。",jEn:"Youthful Folly has success. It is not I who seek the young fool; the young fool seeks me.",xCn:"山下出泉，蒙；君子以果行育德。",xEn:"A spring wells up at the foot of the mountain: Youthful Folly. The superior man fosters his character by thoroughness in all that he does."},
+"7_7":{cn:"艮为山",en:"Gen · Keeping Still",num:52,jCn:"艮其背，不获其身，行其庭，不见其人，无咎。",jEn:"Keeping Still. Keeping his back still so that he no longer feels his body. He goes into his courtyard and does not see his people. No blame.",xCn:"兼山，艮；君子以思不出其位。",xEn:"Mountains standing close together: Keeping Still. The superior man does not permit his thoughts to go beyond his situation."},
+"7_8":{cn:"山地剥",en:"Bo · Splitting Apart",num:23,jCn:"不利有攸往。",jEn:"Splitting Apart. It does not further one to go anywhere.",xCn:"山附于地，剥；上以厚下安宅。",xEn:"The mountain rests on the earth: Splitting Apart. Those above can ensure their position only by giving generously to those below."},
+"8_1":{cn:"地天泰",en:"Tai · Peace",num:11,jCn:"小往大来，吉亨。",jEn:"Peace. The small departs, the great approaches. Good fortune. Success.",xCn:"天地交，泰；后以财成天地之道，辅相天地之宜，以左右民。",xEn:"Heaven and earth unite: Peace. The sovereign divides and completes the course of heaven and earth; he furthers and regulates the gifts of heaven and earth, and so aids the people."},
+"8_2":{cn:"地泽临",en:"Lin · Approach",num:19,jCn:"元亨，利贞。至于八月有凶。",jEn:"Approach has supreme success. Perseverance furthers. When the eighth month comes, there will be misfortune.",xCn:"泽上有地，临；君子以教思无穷，容保民无疆。",xEn:"The earth above the lake: Approach. The superior man is inexhaustible in his willingness to teach, and without limits in his tolerance and protection of the people."},
+"8_3":{cn:"地火明夷",en:"Ming Yi · Darkening of the Light",num:36,jCn:"利艰贞。",jEn:"Darkening of the Light. In adversity it furthers one to be persevering.",xCn:"明入地中，明夷；君子以莅众，用晦而明。",xEn:"The light has sunk into the earth: Darkening of the Light. The superior man lives with the great mass; he veils his light, yet still shines."},
+"8_4":{cn:"地雷复",en:"Fu · Return",num:24,jCn:"亨。出入无疾，朋来无咎。反复其道，七日来复，利有攸往。",jEn:"Return. Success. Going out and coming in without error. Friends come without blame.",xCn:"雷在地中，复；先王以至日闭关，商旅不行，后不省方。",xEn:"Thunder within the earth: Return. The ancient kings closed the passes at the time of the solstice, so that merchants and strangers did not travel, and the ruler did not go on inspection tours."},
+"8_5":{cn:"地风升",en:"Sheng · Pushing Upward",num:46,jCn:"元亨，用见大人，勿恤，南征吉。",jEn:"Pushing Upward has supreme success. One must see the great man. Fear not. Departure toward the south brings good fortune.",xCn:"地中生木，升；君子以顺德，积小以高大。",xEn:"Within the earth, wood grows: Pushing Upward. The superior man of devoted character heaps up small things in order to achieve something high and great."},
+"8_6":{cn:"地水师",en:"Shi · The Army",num:7,jCn:"贞，丈人吉，无咎。",jEn:"The Army. The army needs perseverance and a strong man. Good fortune without blame.",xCn:"地中有水，师；君子以容民畜众。",xEn:"Water in the middle of the earth: The Army. The superior man increases his masses by generosity toward the people."},
+"8_7":{cn:"地山谦",en:"Qian · Modesty",num:15,jCn:"亨，君子有终。",jEn:"Modesty creates success. The superior man carries things through.",xCn:"地中有山，谦；君子以裒多益寡，称物平施。",xEn:"Within the earth, a mountain: Modesty. The superior man reduces that which is too much, and augments that which is too little. He weighs things and makes them equal."},
+"8_8":{cn:"坤为地",en:"Kun · The Receptive",num:2,jCn:"元亨，利牝马之贞。君子有攸往，先迷后得主，利西南得朋，东北丧朋。安贞吉。",jEn:"The Receptive brings about sublime success, furthering through the perseverance of a mare.",xCn:"地势坤，君子以厚德载物。",xEn:"The earth's condition is receptive devotion. Thus the superior man who has breadth of character carries the outer world."}
+};
+const YAO={1:{1:{cn:"初九：潜龙勿用。",en:"Nine at the beginning: Hidden dragon. Do not act."},2:{cn:"九二：见龙在田，利见大人。",en:"Nine in the second place: Dragon appearing in the field. It furthers one to see the great man."},3:{cn:"九三：君子终日乾乾，夕惕若，厉无咎。",en:"Nine in the third place: All day long the superior man is creatively active. At nightfall his mind is still beset with cares. Danger. No blame."},4:{cn:"九四：或跃在渊，无咎。",en:"Nine in the fourth place: Wavering flight over the depths. No blame."},5:{cn:"九五：飞龙在天，利见大人。",en:"Nine in the fifth place: Flying dragon in the heavens. It furthers one to see the great man."},6:{cn:"上九：亢龙有悔。",en:"Nine at the top: Arrogant dragon will have cause to repent."}},2:{1:{cn:"初六：履霜，坚冰至。",en:"Six at the beginning: When there is hoarfrost underfoot, solid ice is not far off."},2:{cn:"六二：直、方、大，不习无不利。",en:"Six in the second place: Straight, square, great. Without purpose, yet nothing remains unfurthered."},3:{cn:"六三：含章可贞。或从王事，无成有终。",en:"Six in the third place: Hidden lines. One is able to remain persevering. If by chance you are in the service of a king, seek not works, but bring to completion."},4:{cn:"六四：括囊；无咎，无誉。",en:"Six in the fourth place: A tied-up sack. No blame, no praise."},5:{cn:"六五：黄裳，元吉。",en:"Six in the fifth place: A yellow lower garment brings supreme good fortune."},6:{cn:"上六：龙战于野，其血玄黄。",en:"Six at the top: Dragons fight in the meadow. Their blood is black and yellow."}},3:{1:{cn:"初九：磐桓；利居贞，利建侯。",en:"Nine at the beginning: Hesitation and hindrance. It furthers one to remain persevering. It furthers one to appoint helpers."},2:{cn:"六二：屯如邅如，乘马班如。匪寇婚媾，女子贞不字，十年乃字。",en:"Six in the second place: Difficulties pile up. Horse and wagon part. He is not a robber; he wants to woo when the time comes."},3:{cn:"六三：即鹿无虞，惟入于林中，君子几不如舍，往吝。",en:"Six in the third place: Whoever hunts deer without the forester only loses his way in the forest. The superior man understands the signs of the time and prefers to desist."},4:{cn:"六四：乘马班如，求婚媾，往吉，无不利。",en:"Six in the fourth place: Horse and wagon part. Strive for union. To go brings good fortune. Everything acts to further."},5:{cn:"九五：屯其膏，小贞吉，大贞凶。",en:"Nine in the fifth place: Difficulties in blessing. A little perseverance brings good fortune. Great perseverance brings misfortune."},6:{cn:"上六：乘马班如，泣血涟如。",en:"Six at the top: Horse and wagon part. Bloody tears flow."}},4:{1:{cn:"初六：发蒙，利用刑人，用说桎梏，以往吝。",en:"Six at the beginning: To make a fool develop it furthers one to apply discipline. The fetters should be removed. To go on in this way brings humiliation."},2:{cn:"九二：包蒙吉；纳妇吉；子克家。",en:"Nine in the second place: To bear with fools in kindliness brings good fortune. To know how to take women brings good fortune. The son is capable of taking charge of the household."},3:{cn:"六三：勿用取女；见金夫，不有躬，无攸利。",en:"Six in the third place: Take not a maiden who, when she sees a man of bronze, loses possession of herself. Nothing furthers."},4:{cn:"六四：困蒙，吝。",en:"Six in the fourth place: Entangled folly brings humiliation."},5:{cn:"六五：童蒙，吉。",en:"Six in the fifth place: Childlike folly brings good fortune."},6:{cn:"上九：击蒙；不利为寇，利御寇。",en:"Nine at the top: In punishing folly it does not further one to commit transgressions. The only thing that furthers is to prevent transgressions."}},5:{1:{cn:"初九：需于郊。利用恒，无咎。",en:"Nine at the beginning: Waiting in the meadow. It furthers one to abide in what endures. No blame."},2:{cn:"九二：需于沙。小有言，终吉。",en:"Nine in the second place: Waiting on the sand. There is some gossip. The end brings good fortune."},3:{cn:"九三：需于泥，致寇至。",en:"Nine in the third place: Waiting in the mud brings about the arrival of the enemy."},4:{cn:"六四：需于血，出自穴。",en:"Six in the fourth place: Waiting in blood. Get out of the pit."},5:{cn:"九五：需于酒食，贞吉。",en:"Nine in the fifth place: Waiting while eating and drinking. Perseverance brings good fortune."},6:{cn:"上六：入于穴，有不速之客三人来，敬之终吉。",en:"Six at the top: One falls into the pit. Three uninvited guests arrive. Honor them, and in the end there will be good fortune."}},6:{1:{cn:"初六：不永所事，小有言，终吉。",en:"Six at the beginning: If one does not perpetuate the affair, there is a little gossip. In the end, good fortune comes."},2:{cn:"九二：不克讼，归而逋，其邑人三百户，无眚。",en:"Nine in the second place: One cannot engage in conflict; one returns home, gives way. The people of his town, three hundred households, remain free of guilt."},3:{cn:"六三：食旧德，贞厉，终吉，或从王事，无成。",en:"Six in the third place: To nourish oneself on ancient virtue induces perseverance. Danger. In the end, good fortune comes."},4:{cn:"九四：不克讼，复即命，渝安贞，吉。",en:"Nine in the fourth place: One cannot engage in conflict. One turns back and submits to fate, changes one's attitude, and finds peace in perseverance. Good fortune."},5:{cn:"九五：讼元吉。",en:"Nine in the fifth place: To contend before him brings supreme good fortune."},6:{cn:"上九：或锡之鞶带，终朝三褫之。",en:"Nine at the top: Even if by chance a leather belt is bestowed on one, by the end of a morning it will have been snatched away three times."}},7:{1:{cn:"初六：师出以律，否臧凶。",en:"Six at the beginning: An army must set forth in proper order. If the order is not good, misfortune threatens."},2:{cn:"九二：在师中，吉无咎，王三锡命。",en:"Nine in the second place: In the midst of the army. Good fortune. No blame. The king bestows a triple decoration."},3:{cn:"六三：师或舆尸，凶。",en:"Six in the third place: Perchance the army carries corpses in the wagon. Misfortune."},4:{cn:"六四：师左次，无咎。",en:"Six in the fourth place: The army retreats. No blame."},5:{cn:"六五：田有禽，利执言，无咎。长子帅师，弟子舆尸，贞凶。",en:"Six in the fifth place: There is game in the field. It furthers one to catch it. Without blame. Let the eldest lead the army. The younger transports corpses; then perseverance brings misfortune."},6:{cn:"上六：大君有命，开国承家，小人勿用。",en:"Six at the top: The great prince issues commands, founds states, vests families with fiefs. Inferior people should not be employed."}},8:{1:{cn:"初六：有孚，比之，无咎。有孚盈缶，终来有他，吉。",en:"Six at the beginning: Hold to him in truth and loyalty; this is without blame. Truth, like a full earthen bowl."},2:{cn:"六二：比之自内，贞吉。",en:"Six in the second place: Hold to him inwardly. Perseverance brings good fortune."},3:{cn:"六三：比之匪人。",en:"Six in the third place: Hold to people with whom you have no real relationship."},4:{cn:"六四：外比之，贞吉。",en:"Six in the fourth place: Hold to him outwardly also. Perseverance brings good fortune."},5:{cn:"九五：显比，王用三驱，失前禽。邑人不诫，吉。",en:"Nine in the fifth place: Manifestation of holding together. In the hunt the king uses beaters on three sides only."},6:{cn:"上六：比之无首，凶。",en:"Six at the top: He finds no head for holding together. Misfortune."}}};
+const YAO_FALLBACK={1:{cn:"初爻：潜藏蓄势，不宜妄动。",en:"Beginning line: Hidden potential. Do not act prematurely."},2:{cn:"二爻：渐露头角，可寻求支持。",en:"Second line: Emerging. It is favorable to seek support."},3:{cn:"三爻：处于过渡，需谨慎惕厉。",en:"Third line: Transition. Danger. Be vigilant."},4:{cn:"四爻：进退之间，可审时度势。",en:"Fourth line: Wavering. No blame if one adapts."},5:{cn:"五爻：居中得位，大有可为。",en:"Fifth line: Central and correct. Great success possible."},6:{cn:"上爻：物极必反，宜知止。",en:"Top line: Extremity. Know when to stop."}};
+let currentMode="time";
+function modToGua(n){const r=n%8;return r===0?8:r}
+function modToYao(n){const r=n%6;return r===0?6:r}
+function trueRandom(max){const a=new Uint32Array(1);crypto.getRandomValues(a);return(a[0]%max)+1}
+function getLines(u,l){return[...BAGUA[l].bin,...BAGUA[u].bin]}
+function getChangedLines(lines,yao){const n=[...lines];n[yao-1]=n[yao-1]===1?0:1;return n}
+function linesToGuaNums(lines){const lb=lines.slice(0,3).join(""),ub=lines.slice(3,6).join("");let ln=8,un=8;for(let i=1;i<=8;i++){if(BAGUA[i].bin.join("")===lb)ln=i;if(BAGUA[i].bin.join("")===ub)un=i}return{upperNum:un,lowerNum:ln}}
+function renderLines(id,lines,ch){const el=document.getElementById(id);el.innerHTML="";for(let i=0;i<6;i++){const d=document.createElement("div");d.className="yao "+(lines[i]===1?"yang":"yin");if(ch===i+1)d.classList.add("changing");const s=document.createElement("span");s.className="yao-num";s.textContent=i+1;d.appendChild(s);el.appendChild(d)}}
+function getYaoText(num,yao){return(YAO[num]&&YAO[num][yao])?YAO[num][yao]:YAO_FALLBACK[yao]}
+function setNow(){const n=new Date();document.getElementById("year").value=n.getFullYear();document.getElementById("month").value=n.getMonth()+1;document.getElementById("day").value=n.getDate();document.getElementById("hour").value=n.getHours();document.getElementById("minute").value=n.getMinutes();document.getElementById("second").value=n.getSeconds()}
+function setMode(m){currentMode=m;document.getElementById("modeTime").classList.toggle("active",m==="time");document.getElementById("modeRandom").classList.toggle("active",m==="random");document.querySelectorAll("#timeInputs input").forEach(i=>i.disabled=m==="random");document.getElementById("btnNow").style.display=m==="time"?"block":"none";document.getElementById("btnCalc").textContent=m==="time"?"Calculate (DateTime)":"Generate True Random"}
+function calculate(){
+  let upperNum,lowerNum,yaoNum,metaHtml="";
+  if(currentMode==="time"){
+    const y=+document.getElementById("year").value,m=+document.getElementById("month").value,d=+document.getElementById("day").value,h=+document.getElementById("hour").value,mi=+document.getElementById("minute").value,s=+document.getElementById("second").value;
+    if([y,m,d,h,mi,s].some(v=>isNaN(v))){alert("请填写完整的 DateTime 数值");return}
+    const us=y+m+d+h+mi;upperNum=modToGua(us);
+    const ls=y+m+d+h+mi+s;lowerNum=modToGua(ls);
+    const ys=h+mi+s;yaoNum=modToYao(ys);
+    metaHtml=`<div>Mode: <span>DateTime（梅花易数风格）</span></div><div>上卦 sum=<span>${us}</span>→%8=<span>${upperNum}</span> (${BAGUA[upperNum].cn})</div><div>下卦 sum=<span>${ls}</span>→%8=<span>${lowerNum}</span> (${BAGUA[lowerNum].cn})</div><div>动爻 sum=<span>${ys}</span>→%6=<span>${yaoNum}</span></div><div class="formula">余数0→记为8（卦）或6（爻）</div>`;
+  }else{
+    upperNum=trueRandom(8);const lr=trueRandom(64);lowerNum=modToGua(lr);const yr=trueRandom(216);yaoNum=modToYao(yr);
+    metaHtml=`<div>Mode: <span>True Random (crypto.getRandomValues)</span></div><div>Upper:<span>${upperNum}</span> · Lower raw:<span>${lr}</span>→<span>${lowerNum}</span> · Yao raw:<span>${yr}</span>→<span>${yaoNum}</span></div><div class="formula">支持手机/电脑浏览器</div>`;
+  }
+  const benLines=getLines(upperNum,lowerNum);
+  const benKey=upperNum+"_"+lowerNum;
+  const benHex=HEX[benKey];
+  const bianLines=getChangedLines(benLines,yaoNum);
+  const bianGua=linesToGuaNums(bianLines);
+  const bianKey=bianGua.upperNum+"_"+bianGua.lowerNum;
+  const bianHex=HEX[bianKey];
+  document.getElementById("benName").textContent=benHex.cn;
+  document.getElementById("benEn").textContent="#"+benHex.num+" "+benHex.en;
+  renderLines("benLines",benLines,yaoNum);
+  document.getElementById("benTrigram").textContent="上"+BAGUA[upperNum].cn+BAGUA[upperNum].symbol+" 下"+BAGUA[lowerNum].cn+BAGUA[lowerNum].symbol;
+  document.getElementById("bianName").textContent=bianHex.cn;
+  document.getElementById("bianEn").textContent="#"+bianHex.num+" "+bianHex.en;
+  renderLines("bianLines",bianLines,yaoNum);
+  document.getElementById("bianTrigram").textContent="上"+BAGUA[bianGua.upperNum].cn+BAGUA[bianGua.upperNum].symbol+" 下"+BAGUA[bianGua.lowerNum].cn+BAGUA[bianGua.lowerNum].symbol;
+  document.getElementById("yaoVal").textContent=yaoNum;
+  document.getElementById("benJudgmentCn").textContent=benHex.jCn;
+  document.getElementById("benJudgmentEn").textContent=benHex.jEn;
+  document.getElementById("benXiangCn").textContent=benHex.xCn;
+  document.getElementById("benXiangEn").textContent=benHex.xEn;
+  const yt=getYaoText(benHex.num,yaoNum);
+  document.getElementById("yaoCiCn").textContent=yt.cn;
+  document.getElementById("yaoCiEn").textContent=yt.en;
+  document.getElementById("bianJudgmentCn").textContent=bianHex.jCn;
+  document.getElementById("bianJudgmentEn").textContent=bianHex.jEn;
+  document.getElementById("bianXiangCn").textContent=bianHex.xCn;
+  document.getElementById("bianXiangEn").textContent=bianHex.xEn;
+  document.getElementById("metaInfo").innerHTML=metaHtml;
+  document.getElementById("result").classList.add("show");
+}
+document.getElementById("modeTime").addEventListener("click",()=>setMode("time"));
+document.getElementById("modeRandom").addEventListener("click",()=>setMode("random"));
+document.getElementById("btnNow").addEventListener("click",()=>{setNow();if(currentMode==="time")calculate()});
+document.getElementById("btnCalc").addEventListener("click",calculate);
+setNow();
+setMode("time");
+  </script>
+</body>
+</html>
